@@ -52,7 +52,7 @@ export default {
   /*background-color: #E9EEF3;*/
   color: #333;
   text-align: center;
-  line-height: 57px;
+  line-height: 38px;
   padding-left: 70px;
   padding-right: 70px;
 }
