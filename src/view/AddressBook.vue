@@ -7,9 +7,10 @@
         clearable
         @click="search"
         @keyup.enter.native="search"
+        @clear="resetData"
     ></el-input>
     <div class="header">
-      <span class="total">共 {{ total }} 个联系人</span>
+      <span class="total">共 {{ cardData.length }} 个联系人</span>
     </div>
     <el-radio v-model="radio" label="1" @click="filterData('')">所有联系人</el-radio>
     <el-radio v-model="radio" label="2" @click="filterData('亲人')">亲人</el-radio>
@@ -27,7 +28,6 @@
             </div>
           </div>
         </el-card>
-
       </el-col>
     </el-row>
     <el-pagination
@@ -36,7 +36,7 @@
         :current-page.sync="currentPage"
         :page-size="pageSize"
         layout="prev, pager, next"
-        :total="total"
+        :total="cardData.length"
         @current-change="handleCurrentChange"
     ></el-pagination>
   </div>
@@ -46,7 +46,6 @@ export default {
   data() {
     return {
       searchText: '',
-      total: 21,
       pageSize: 15,
       currentPage: 1,
       radio: '1',
@@ -156,7 +155,8 @@ export default {
           tel: 18751310510,
           category: '朋友'
         },
-      ]
+      ],
+      initialCardData: []
     }
   },
   computed: {
@@ -169,10 +169,15 @@ export default {
   methods: {
     handleCurrentChange(val) {
       this.currentPage = val
-    }, search() {
+    },
+    search() {
       const searchText = this.searchText.toLowerCase()
       if (searchText) {
-        const filteredData = this.cardData.filter(card => {
+        // 第一次搜索时保存初始数据
+        if (this.initialCardData.length === 0) {
+          this.initialCardData = [...this.cardData]
+        }
+        const filteredData = this.initialCardData.filter(card => {
           const name = card.name.toLowerCase()
           return name.includes(searchText)
         })
@@ -180,33 +185,150 @@ export default {
         this.total = filteredData.length
         this.currentPage = 1
       } else {
-        this.cardData = [
-          {name: '张三'},
-          {name: '李四'},
-          {name: '王五'},
-          {name: '赵六'},
-          {name: '钱七'},
-          {name: '孙八'},
-          {name: '杨九'},
-          {name: '顾十'},
-          {name: '徐十一'},
-          {name: '季十二'},
-        ]
-        this.total = 10
+        // 如果搜索框为空，则使用初始数据
+        this.cardData = [...this.initialCardData]
+        this.total = this.cardData.length
         this.currentPage = 1
       }
     },
+    resetData() {
+      this.searchText = ''
+      this.cardData = [
+        {
+          name: '郑一',
+          tel: 18751310510,
+          category: '同学'
+        },
+        {
+          name: '季二',
+          tel: 18751310510,
+          category: '朋友'
+        },
+        {
+          name: '张三',
+          tel: 18751310510,
+          category: '朋友'
+        },
+        {
+          name: '李四',
+          tel: 18751310510,
+          category: '朋友'
+        },
+        {
+          name: '王五',
+          tel: 18751310510,
+          category: '朋友'
+        },
+        {
+          name: '赵六',
+          tel: 18751310510,
+          category: '家人'
+        },
+        {
+          name: '钱七',
+          tel: 18751310510,
+          category: '朋友'
+        },
+        {
+          name: '孙八',
+          tel: 18751310510,
+          category: '朋友'
+        },
+        {
+          name: '杨九',
+          tel: 18751310510,
+          category: '朋友'
+        },
+        {
+          name: '顾十',
+          tel: 18751310510,
+          category: '朋友'
+        },
+        {
+          name: '徐十一',
+          tel: 18751310510,
+          category: '朋友'
+        },
+        {
+          name: '冯十二',
+          tel: 18751310510,
+          category: '朋友'
+        },
+        {
+          name: '陈十三',
+          tel: 18751310510,
+          category: '朋友'
+        },
+        {
+          name: '楚十四',
+          tel: 18751310510,
+          category: '朋友'
+        },
+        {
+          name: '魏十五',
+          tel: 18751310510,
+          category: '朋友'
+        },
+        {
+          name: '秦十六',
+          tel: 18751310510,
+          category: '朋友'
+        },
+        {
+          name: '唐十七',
+          tel: 18751310510,
+          category: '朋友'
+        },
+        {
+          name: '宋十八',
+          tel: 18751310510,
+          category: '朋友'
+        },
+        {
+          name: '元十九',
+          tel: 18751310510,
+          category: '朋友'
+        },
+        {
+          name: '明二十',
+          tel: 18751310510,
+          category: '朋友'
+        },
+        {
+          name: '清二十一',
+          tel: 18751310510,
+          category: '朋友'
+        },
+      ]
+      // 重置初始数据
+      this.initialCardData = [...this.cardData]
+      this.total = this.cardData.length
+      this.currentPage = 1
+    },
     deleteCard(index) {
       this.cardData.splice((this.currentPage - 1) * this.pageSize + index, 1)
-      if (this.cardData.length % this.pageSize === 0) {
-        this.total -= this.pageSize
-        if (this.currentPage > Math.ceil(this.total / this.pageSize)) {
-          this.currentPage--
-        }
-      }
     },
-    filterData(category){
-      console.log(category)
+    filterData() {
+      const radioText = this.radioText.toLowerCase()
+      if (radioText) {
+        // 第一次筛选时保存初始数据
+        if (this.initialCardData.length === 0) {
+          this.initialCardData = [...this.cardData]
+        }
+        const filteredData = this.initialCardData.filter(card => {
+          const name = card.name.toLowerCase()
+          return name.includes(radioText)
+        })
+        this.cardData = filteredData
+        this.total = filteredData.length
+        this.currentPage = 1
+      } else {
+        // 如果搜索框为空，则使用初始数据
+        this.cardData = [...this.initialCardData]
+        this.total = this.cardData.length
+        this.currentPage = 1
+      }
+      console.log('1')
     }
   }
 }

@@ -8,7 +8,7 @@
         <el-aside width="250px">
           <common-aside/>
         </el-aside>
-        <el-main style="background: rgba(48, 122, 172,0.5)">
+        <el-main style="background: rgba(196, 221, 245,0.8)">
           <router-view></router-view>
         </el-main>
       </el-container>
@@ -44,10 +44,6 @@ export default {
   line-height: 200px;
 }
 
-.el-header {
-  /*height: 8vh!important;*/
-}
-
 .el-main {
   /*background-color: #E9EEF3;*/
   color: #333;
@@ -61,12 +57,4 @@ body > .el-container {
   margin-bottom: 40px;
 }
 
-.el-container:nth-child(5) .el-aside,
-.el-container:nth-child(6) .el-aside {
-  line-height: 260px;
-}
-
-.el-container:nth-child(7) .el-aside {
-  line-height: 320px;
-}
 </style>

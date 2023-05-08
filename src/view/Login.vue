@@ -17,11 +17,11 @@
             <el-form
                 ref="registerForm"
                 :model="registerForm"
-                :rules="registerRules"
+                :rules="Rules"
             >
               <el-form-item
                   prop="username"
-                  :rules="registerRules.username"
+                  :rules="Rules.username"
               >
                 <el-input
                     v-model="registerForm.username"
@@ -30,7 +30,7 @@
               </el-form-item>
               <el-form-item
                   prop="tel"
-                  :rules="registerRules.tel">
+                  :rules="Rules.tel">
                 <el-input
                     v-model="registerForm.tel"
                     placeholder="手机号"
@@ -38,7 +38,7 @@
               </el-form-item>
               <el-form-item
                   prop="password"
-                  :rules="registerRules.password"
+                  :rules="Rules.password"
               >
                 <el-input
                     type="password"
@@ -49,11 +49,21 @@
               <el-form-item>
                 <el-button
                     type="primary"
+                    :loading="loading"
+
                     @click="register"
                     style="width: 100%; margin-top: 20px"
                 >
                   注册速讯
                 </el-button>
+                <el-alert
+                    v-if="registerSuccess"
+                    title="注册成功"
+                    type="success"
+                    show-icon
+                    center
+                    :closable="false"
+                ></el-alert>
               </el-form-item>
             </el-form>
           </el-tab-pane>
@@ -63,15 +73,15 @@
             <el-form
                 ref="loginForm"
                 :model="loginForm"
-                :rules="loginRules"
+                :rules="Rules"
             >
-              <el-form-item prop="username" :rules="loginRules.username">
+              <el-form-item prop="username" :rules="Rules.username">
                 <el-input
                     v-model="loginForm.username"
                     placeholder="用户名"
                 ></el-input>
               </el-form-item>
-              <el-form-item prop="password" :rules="loginRules.password">
+              <el-form-item prop="password" :rules="Rules.password">
                 <el-input
                     type="password"
                     v-model="loginForm.password"
@@ -81,6 +91,7 @@
               <el-button
                   type="primary"
                   @click="login"
+                  :loading="loading"
                   style="width: 100%; margin-top: 60px"
               >
                 登录
@@ -98,7 +109,9 @@
 export default {
   data() {
     return {
-      // loading: true,
+      loading: false,
+      registerSuccess: false, // 注册成功标志
+
       defaultActiveTab: "register",
       activeTab: "register",
       registerForm: {
@@ -106,7 +119,7 @@ export default {
         password: "",
         tel: "",
       },
-      registerRules: {
+      Rules: {
         username: [
           {required: true, message: "*姓名不能为空且只能由字母、数字、下划线组成", trigger: "blur"},
         ],
@@ -135,28 +148,40 @@ export default {
         username: "",
         password: "",
       },
-      loginRules: {
-        username: [
-          {
-            required: true,
-            message: "请输入用户名",
-            trigger: "blur"
-          }
-        ],
-        password: [
-          {
-            required: true,
-            message: "请输入密码",
-            trigger: "blur"
-          }
-        ],
-      },
+
     };
   },
   methods: {
     login() {
+      this.loading = true;
+      this.$refs["loginForm"].validate(valid => {
+        if (!valid) {
+          this.loading = false; // 登录失败也要隐藏 loading 图标
+          return;
+        }
+        console.log('登录成功')
+        //跳转到首页
+        setTimeout(() => {
+          this.$router.push('/AddressBook')
+          this.loading = false; //登录成功后隐藏 loading 图标
+        }, 2000);
+      })
     },
     register() {
+      this.loading = true;
+      this.$refs["registerForm"].validate(valid => {
+        if (valid) {
+          console.log('注册成功')
+          setTimeout(() => {
+            this.activeTab = "login";
+            this.loading = false; // 注册成功后隐藏 loading 图标
+            this.registerSuccess = true;
+
+          }, 3000);
+        } else {
+          this.loading = false; // 注册失败也要隐藏 loading 图标
+        }
+      })
     },
   },
 };
@@ -177,11 +202,11 @@ html {
 }
 
 .el-form-item__content {
-  margin: 0px !important;
+  margin: 0 !important;
 }
 
 .el-form-item {
-  margin: 0px;
+  margin: 0;
 }
 
 .el-form-item__error {
