@@ -1,7 +1,6 @@
 <template>
   <el-menu
       style="width: 250px"
-      default-active="2"
       class="el-menu-vertical-demo"
       @open="handleOpen"
       @close="handleClose"
@@ -9,14 +8,14 @@
   >
 
     <el-menu-item
-        :class="item.name === currentMenuName ? 'active' : ''"
+        :class="item.name === currentMenuName ? 'is-active' : ''"
         @click="clickAddressBook(item)"
         v-for="item in noChildren"
         :key="item.name"
         :index="item.name"
     >
       <i :class="`el-icon-${item.icon}`"></i>
-      <span slot="title">{{ item.name }}</span>
+      <span slot="title">{{ item.label }}</span>
     </el-menu-item>
     <a href="" class="logout el-icon-s-tools" @click="logOut">退出登录</a>
 
@@ -41,7 +40,8 @@
   left: 150px;
 }
 .active{
-  text-color: pink;
+  color: #409EFF
+;
 }
 </style>
 
@@ -52,20 +52,21 @@ export default {
       menuData: [
         {
           path: '/AddressBook',
-          name: '通讯录',
+          label: '通讯录',
+          name: 'addressBook',
           icon: 'phone'
         },
         {
           path: '/AddInform',
-          name: '添加信息',
+          label: '添加信息',
+          name: 'addInform',
           icon: 'menu'
-
         },
         {
           path: '/PersonalCenter',
-          name: '个人中心',
+          label: '个人中心',
+          name: 'personalCenter',
           icon: 'user'
-
         },
 
       ],

@@ -8,15 +8,16 @@
           label-width="100px"
           ref="ruleForm"
       >
-        <el-form-item label="姓名:" prop="username">
+        <el-form-item label="姓名:" prop="username" :rules="Rules.username">
           <span v-show="isShow">{{ ruleForm.username }}</span>
           <el-input v-model="ruleForm.username" v-show="!isShow"></el-input>
         </el-form-item>
-        <el-form-item label="电话号码:" prop="tel">
+        <el-form-item label="电话号码:" prop="tel" :rules="Rules.tel">
           <span v-show="isShow">{{ ruleForm.tel }}</span>
-          <el-input v-model="ruleForm.tel" v-show="!isShow"></el-input>
+          <el-input v-model="ruleForm.tel" v-show="!isShow" :rules="Rules.password"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="密码:" prop="password">
+        <el-form-item label="密码:" prop="password" :rules="Rules.password">
           <span v-show="isShow">{{ ruleForm.password }}</span>
           <el-input v-model="ruleForm.password" v-show="!isShow"></el-input>
         </el-form-item>
@@ -43,6 +44,36 @@ export default {
         tel: "",
         password: ""
       },
+      Rules: {
+        username: [
+          {required: true, message: "*姓名不能为空", trigger: "blur"},
+          {
+            pattern: /^[0-9a-zA-Z_]{1,}$/,
+            message: "只能有数字、字母、下划线组成",
+            trigger: "blur"
+          },
+        ],
+        tel: [
+          {required: true, message: "*手机号全为数字", trigger: "blur"},
+          {
+            pattern: /^1[3456789]\d{9}$/,
+            message: "*请输入正确的手机号格式",
+            trigger: "blur",
+          },
+        ],
+        password: [
+          {
+            required: true,
+            message: "*密码不能小于6位",
+            trigger: "blur"
+          },
+          {
+            min: 6,
+            message: "密码长度应在大于6位",
+            trigger: "blur",
+          },
+        ],
+      },
       isShow: true,
       oldMsg: ""
     };
@@ -65,7 +96,7 @@ export default {
           const str = JSON.stringify(this.ruleForm);
           if (str === this.oldMsg) {
             // 两个相等,用户最终并没有修改
-            return;
+            // return;
           } else {
             // 发生了修改,发送请求修改数据
           }
@@ -83,8 +114,7 @@ export default {
 
 <style>
 
-
-.message .el-button {
+.message {
   width: 220px;
 
 }
@@ -98,7 +128,7 @@ export default {
   margin-left: -60px;
 }
 
-.message .el-input {
+.message {
   height: 43px;
   width: 252px;
 }

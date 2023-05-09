@@ -14,9 +14,9 @@ const routes = [
         component: Main,
         redirect: 'AddressBook',
         children: [
-            { path: '/AddressBook', component: addressBook },
-            { path: '/AddInform', component: addInform },
-            { path: '/PersonalCenter', component: personalCenter },
+            { path: '/AddressBook', component: addressBook ,name: 'addressBook'},
+            { path: '/AddInform', component: addInform ,name: 'addInform'},
+            { path: '/PersonalCenter', component: personalCenter ,name: 'personalCenter'},
         ]
     },
 
