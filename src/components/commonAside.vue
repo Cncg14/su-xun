@@ -88,7 +88,7 @@ export default {
       // 销毁 token
       localStorage.setItem('token', '')
       // 跳转到登录页
-      location.hash = '/view/Login'
+      location.hash = '/Login'
     }
   },
   computed: {

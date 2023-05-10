@@ -9,33 +9,54 @@
         @keyup.enter.native="search"
         @clear="resetData"
     ></el-input>
-    <div class="header">
-      <span class="total">共 {{ cardData.length }} 个联系人</span>
+    <div class="header text-left">
+      <span class="total">共 {{ filteredCards.length }} 个联系人</span>
     </div>
-    <el-radio-group v-model="radio" >
+    <el-radio-group v-model="radio">
       <el-radio :label="'all'">所有联系人</el-radio>
       <el-radio :label="'family'">亲人</el-radio>
-      <el-radio :label="'friend'">friend</el-radio>
+      <el-radio :label="'friend'">朋友</el-radio>
       <el-radio :label="'schoolmate'">同学</el-radio>
     </el-radio-group>
     <el-row>
       <el-col v-for="(card, index) in currentPageData" :key="index" :span="8">
-        <el-card :body-style="{ padding: '0px' }" shadow="hover">
+        <el-card :body-style="{ padding: '0px',height:'100px' }" shadow="hover">
           <div style="display: flex; align-items: center; padding: 14px;">
             <i class="el-icon-user-solid" style="font-size: 20px; padding: 10px;"></i>
             <div style="font-size: 16px;">
               <span v-if="editingIndex === index">
-              <el-input v-model="card.name"></el-input>
-              <el-input v-model="card.tel"></el-input>
+                <el-input v-model="card.name"></el-input>
+                <el-input v-model="card.tel"></el-input>
               </span>
-              <span v-else>{{ card.name }}{{ card.tel }}</span>
+              <span v-else>{{ card.name }}<br>{{ card.tel }}</span>
+              <!--              <span>{{ card.tel }}</span>-->
             </div>
             <div style="float: right;">
-              <el-button type="text" size="mini" v-if="editingIndex === index" @click="editingIndex = -1"
-                         class="el-icon-check">
+              <el-button
+                  type="text" size="mini"
+                  v-if="editingIndex === index"
+                  @click="handleCheck(index)"
+                  class="el-icon-check">
               </el-button>
-              <el-button type="text" size="mini" class="el-icon-edit-outline" @click="editingIndex = index"></el-button>
-              <el-button type="text" size="mini" @click="deleteCard(index)" class="el-icon-delete"></el-button>
+              <el-button
+                type="text" size="mini"
+                v-if="editingIndex === index"
+                @click="editingIndex = -1"
+                class="el-icon-close">
+            </el-button>
+              <el-button
+                  type="text"
+                  size="mini"
+                  v-if="editingIndex !== index"
+                  class="el-icon-edit-outline"
+                  @click="editingIndex = index">
+              </el-button>
+              <el-button type="text"
+                         size="mini"
+                         v-if="editingIndex !== index"
+                         @click="deleteCard(index)"
+                         class="el-icon-delete">
+              </el-button>
             </div>
           </div>
         </el-card>
@@ -47,7 +68,7 @@
         :current-page.sync="currentPage"
         :page-size="pageSize"
         layout="prev, pager, next"
-        :total="cardData.length"
+        :total="filteredCards.length"
         @current-change="handleCurrentChange"
     ></el-pagination>
   </div>
@@ -59,7 +80,7 @@ export default {
       searchText: '',
       pageSize: 15,
       currentPage: 1,
-      radio: 1,
+      radio: 'all',
       cardData: [
         {
           name: '郑一',
@@ -164,31 +185,43 @@ export default {
         {
           name: '清二十一',
           tel: 18751310510,
-          category: 'friend'
+          category: 'schoolmate'
         },
       ],
+
       initialCardData: [],
       editingIndex: -1,
       cardList: ''
     }
   },
-  watch: {
-    // 每当 question 改变时，这个函数就会执行
-    radio(newQuestion) {
-      // newQuestion 改变之后的radio值
-      this.filterCards(newQuestion)
-    }
-  },
   computed: {
+    filteredCards() {
+      const r = this.radio;
+      if (r !== "all") {
+        return this.cardData.filter(function (item) {
+          return item.category === r;
+        });
+      } else {
+        return this.cardData;
+      }
+    },
     currentPageData() {
       const startIndex = (this.currentPage - 1) * this.pageSize
       const endIndex = startIndex + this.pageSize
-      return this.cardData.slice(startIndex, endIndex)
-    }
+      return this.filteredCards.slice(startIndex, endIndex)
+    },
   },
   methods: {
     handleCurrentChange(val) {
       this.currentPage = val
+    },
+    handleCheck(index) {
+      // 获取当前卡片的数据
+      const card = this.filteredCards[(this.currentPage - 1) * this.pageSize + index]
+      // 保存修改后的数据到本地存储中
+      localStorage.setItem(`card-${index}`, JSON.stringify(card))
+      // 重置编辑状态
+      this.editingIndex = -1
     },
     search() {
       const searchText = this.searchText.toLowerCase()
@@ -328,34 +361,11 @@ export default {
     deleteCard(index) {
       this.cardData.splice((this.currentPage - 1) * this.pageSize + index, 1)
     },
-
-    filterData(category) {
-      console.log('category:', category);
-      if (category === 'all') {
-        console.log('all:', this.cardData);
-        return this.cardData;
-      } else {
-        const filteredData = this.cardData.filter(card => card.category.toLowerCase() === category.toLowerCase());
-        console.log(category + ':', filteredData);
-        return filteredData;
-      }
-    },
-    filterCards(category) {
-      this.cardData = this.filterData(category);
-    },
   }
 }
 </script>
 
 <style lang="less" scoped>
-.contacts {
-  padding: 20px;
-}
-
-.el-card__body {
-  display: flex;
-  align-items: center;
-}
 
 .total {
   font-size: 12px;
