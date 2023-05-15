@@ -85,11 +85,10 @@ export default {
     },
     // 退出登录
     logOut() {
-      // 销毁 token
-      localStorage.setItem('token', '')
+      // 清除登录状态
+      localStorage.removeItem("isLogin");
       // 跳转到登录页
-      location.hash = '/Login'
-    }
+      this}
   },
   computed: {
     noChildren() {

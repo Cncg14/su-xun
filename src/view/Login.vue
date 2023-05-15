@@ -50,7 +50,6 @@
                 <el-button
                     type="primary"
                     :loading="loading"
-
                     @click="register"
                     style="width: 100%; margin-top: 20px"
                 >
@@ -102,10 +101,13 @@
         </el-tabs>
       </el-col>
     </el-row>
+    <a class=" el-icon-s-tools" @click="goAddressBook">通讯录</a>
+
   </div>
 </template>
 
 <script>
+
 export default {
   data() {
     return {
@@ -122,6 +124,11 @@ export default {
       Rules: {
         username: [
           {required: true, message: "*姓名不能为空且只能由字母、数字、下划线组成", trigger: "blur"},
+          {
+            pattern:/^\w+$/,
+            message: "*只能由字母、数字、下划线组成",
+            trigger: "blur",
+          },
         ],
         tel: [
           {required: true, message: "*手机号全为数字", trigger: "blur"},
@@ -153,19 +160,19 @@ export default {
   },
   methods: {
     login() {
-      this.loading = true;
-      this.$refs["loginForm"].validate(valid => {
-        if (!valid) {
-          this.loading = false; // 登录失败也要隐藏 loading 图标
-          return;
-        }
-        console.log('登录成功')
-        //跳转到首页
-        setTimeout(() => {
-          this.$router.push('/AddressBook')
-          this.loading = false; //登录成功后隐藏 loading 图标
-        }, 2000);
-      })
+      // 进行账号密码验证
+      if (this.loginForm.username !== "admin" || this.loginForm.password !== "123123") {
+        this.$message.error("账号或密码错误，请重新输入！");
+        this.loading = false; // 登录失败也要隐藏 loading 图标
+        return;
+      }
+      // 登录成功后设置 isLogin 为 true
+      localStorage.setItem("isLogin", true);
+      //跳转到首页
+      setTimeout(() => {
+        this.$router.push('/AddressBook')
+        this.loading = false; //登录成功后隐藏 loading 图标
+      }, 2000);
     },
     register() {
       this.loading = true;
@@ -183,6 +190,11 @@ export default {
         }
       })
     },
+    goAddressBook(){
+      localStorage.removeItem("user"); // 清除本地存储中的登录信息
+      this.$router.push('addressBook');
+    }
+
   },
 };
 </script>
@@ -197,25 +209,6 @@ html {
   background-image: url(/background.webp);
 }
 
-.el-form {
-  width: 400px;
-}
-
-.el-form-item__content {
-  margin: 0 !important;
-}
-
-.el-form-item {
-  margin: 0;
-}
-
-.el-form-item__error {
-  top: 21%;
-  right: 5% !important;
-  left: unset;
-  color: black;
-  font-style: italic;
-}
 
 .h1 {
   color: rgb(29, 137, 232);

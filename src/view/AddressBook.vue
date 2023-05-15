@@ -35,21 +35,21 @@
               <el-button
                   type="text" size="mini"
                   v-if="editingIndex === index"
-                  @click="handleCheck(index)"
+                  @click="handleClick(index)"
                   class="el-icon-check">
               </el-button>
               <el-button
-                type="text" size="mini"
-                v-if="editingIndex === index"
-                @click="editingIndex = -1"
-                class="el-icon-close">
-            </el-button>
+                  type="text" size="mini"
+                  v-if="editingIndex === index"
+                  @click="editingIndex = -1 "
+                  class="el-icon-close">
+              </el-button>
               <el-button
                   type="text"
                   size="mini"
                   v-if="editingIndex !== index"
                   class="el-icon-edit-outline"
-                  @click="editingIndex = index">
+                  @click="handleButtonClick(index)">
               </el-button>
               <el-button type="text"
                          size="mini"
@@ -71,127 +71,65 @@
         :total="filteredCards.length"
         @current-change="handleCurrentChange"
     ></el-pagination>
+    <el-dialog :visible.sync="dialogVisible" title="登录" :append-to-body="true" :close-on-click-modal="false"
+               :close-on-press-escape="false">
+      <el-form ref="loginForm" :model="loginForm" label-width="80px" :rules="Rules">
+        <el-form-item label="账号" prop="username">
+          <el-input v-model="loginForm.username"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="loginForm.password" type="password"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="login">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
+
+
 </template>
 <script>
+import {cardData} from "@/view/data";
+
 export default {
   data() {
     return {
-      searchText: '',
+      searchText: "",
       pageSize: 15,
       currentPage: 1,
-      radio: 'all',
-      cardData: [
-        {
-          name: '郑一',
-          tel: 18751310510,
-          category: 'schoolmate'
-        },
-        {
-          name: '季二',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '张三',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '李四',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '王五',
-          tel: 18751310510,
-          category: 'family'
-        },
-        {
-          name: '赵六',
-          tel: 18751310510,
-          category: 'family'
-        },
-        {
-          name: '钱七',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '孙八',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '杨九',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '顾十',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '徐十一',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '冯十二',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '陈十三',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '楚十四',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '魏十五',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '秦十六',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '唐十七',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '宋十八',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '元十九',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '明二十',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '清二十一',
-          tel: 18751310510,
-          category: 'schoolmate'
-        },
-      ],
-
-      initialCardData: [],
+      radio: "all",
+      cardData: cardData,
       editingIndex: -1,
-      cardList: ''
+      initialCardData: [],
+      dialogVisible: false,
+      loginForm: {
+        username: "",
+        password: "",
+      },
+      Rules: {
+        username: [
+          {required: true, message: "*姓名不能为空且只能由字母、数字、下划线组成", trigger: "blur"},
+          {
+            pattern: /^\w+$/,
+            message: "*只能由字母、数字、下划线组成",
+            trigger: "blur",
+          },
+        ],
+        password: [
+          {
+            required: true,
+            message: "*密码不能小于6位",
+            trigger: "blur"
+          },
+          {
+            min: 6,
+            message: "密码长度应在大于6位",
+            trigger: "blur",
+          },
+        ],
+      },
     }
   },
   computed: {
@@ -211,11 +149,58 @@ export default {
       return this.filteredCards.slice(startIndex, endIndex)
     },
   },
+  mounted() {
+    // 判断用户是否已经登录
+    if (!localStorage.getItem("isLogin")) {
+      this.dialogVisible = true
+    }
+  },
   methods: {
     handleCurrentChange(val) {
       this.currentPage = val
     },
-    handleCheck(index) {
+    login() {
+      // 进行账号密码验证
+      if (this.loginForm.username !== "admin" || this.loginForm.password !== "123123") {
+        this.$message.error("账号或密码错误，请重新输入！");
+        this.loading = false; // 登录失败也要隐藏 loading 图标
+        return;
+      }
+      // 登录成功后设置 isLogin 为 true
+      localStorage.setItem("isLogin", true);
+      //跳转到首页
+      setTimeout(() => {
+        this.dialogVisible = false
+
+        this.$router.push('/AddressBook')
+        this.loading = false; //登录成功后隐藏 loading 图标
+      }, 2000);
+    },
+    submitForm() {
+      // 只有当按钮被激活时才会执行保存数据的操作
+      if (this.isActive) {
+        // 在这里添加保存数据的代码
+        // 例如：localStorage.setItem('data', JSON.stringify(this.form))
+        // 手动触发表单验证
+        this.$refs.form.validate((valid) => {
+          if (valid) {
+            // 表单验证通过，提交表单
+            this.$refs.form.submit()
+          }
+        })
+      }
+    },
+    handleButtonClick(index) {
+      // 判断用户是否已经登录
+      if (!localStorage.getItem("isLogin")) {
+        this.dialogVisible = true
+
+      } else {
+        this.editingIndex = index;
+      }
+    },
+    handleClick(index) {
+      // 判断是否点击了“check”按钮
       // 获取当前卡片的数据
       const card = this.filteredCards[(this.currentPage - 1) * this.pageSize + index]
       // 保存修改后的数据到本地存储中
@@ -246,121 +231,19 @@ export default {
     },
     resetData() {
       this.searchText = ''
-      this.cardData = [
-        {
-          name: '郑一',
-          tel: 18751310510,
-          category: '同学'
-        },
-        {
-          name: '季二',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '张三',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '李四',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '王五',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '赵六',
-          tel: 18751310510,
-          category: 'family'
-        },
-        {
-          name: '钱七',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '孙八',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '杨九',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '顾十',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '徐十一',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '冯十二',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '陈十三',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '楚十四',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '魏十五',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '秦十六',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '唐十七',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '宋十八',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '元十九',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '明二十',
-          tel: 18751310510,
-          category: 'friend'
-        },
-        {
-          name: '清二十一',
-          tel: 18751310510,
-          category: 'friend'
-        },
-      ]
+      this.cardData = cardData;
       // 重置初始数据
       this.initialCardData = [...this.cardData]
       this.total = this.cardData.length
       this.currentPage = 1
     },
     deleteCard(index) {
-      this.cardData.splice((this.currentPage - 1) * this.pageSize + index, 1)
-    },
+      if (!localStorage.getItem("isLogin")) {
+        this.dialogVisible = true
+      } else {
+        this.cardData.splice((this.currentPage - 1) * this.pageSize + index, 1)
+      }
+    }
   }
 }
 </script>

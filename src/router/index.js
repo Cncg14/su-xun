@@ -5,7 +5,9 @@ import Login from '../view/Login.vue'
 import Main from '../view/Main.vue'
 import personalCenter from "@/view/PersonalCenter.vue";
 import addInform from "@/view/Addinform.vue";
+import Vuex from 'vuex'
 Vue.use(VueRouter)
+Vue.use(Vuex)
 
 const routes = [
     //主路由
@@ -16,7 +18,7 @@ const routes = [
         children: [
             { path: '/AddressBook', component: addressBook ,name: 'addressBook'},
             { path: '/AddInform', component: addInform ,name: 'addInform'},
-            { path: '/PersonalCenter', component: personalCenter ,name: 'personalCenter'},
+            { path: '/PersonalCenter', component: personalCenter ,name: 'personalCenter' ,props:{username:'username'}},
         ]
     },
 

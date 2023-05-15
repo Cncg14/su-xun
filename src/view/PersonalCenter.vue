@@ -35,23 +35,22 @@
 
 <script>
 
+import {addUser, userForm} from "./data";
+// import { addContact } from './data.js'
+
 export default {
   data() {
     // 表单校验
     return {
-      ruleForm: {
-        username: "",
-        tel: "",
-        password: ""
-      },
+      ruleForm: userForm,
       Rules: {
         username: [
           {required: true, message: "*姓名不能为空", trigger: "blur"},
-          {
-            pattern: /^[0-9a-zA-Z_]{1,}$/,
-            message: "只能有数字、字母、下划线组成",
-            trigger: "blur"
-          },
+          // {
+          // //   // pattern: /^[0-9a-zA-Z_]{1,}$/,
+          //   // message: "只能有数字、字母、下划线组成",
+          //   // trigger: "blur"
+          // },
         ],
         tel: [
           {required: true, message: "*手机号全为数字", trigger: "blur"},
@@ -107,6 +106,12 @@ export default {
       this.isShow = true;
       // 放弃操作,直接将原来的值赋值给ruleForm
       this.ruleForm = JSON.parse(this.oldMsg);
+    },
+    submitInform() {
+      // 获取表单数据
+      const {username, tel, password} = this.ruleForm
+      // 调用 addUser 方法将数据传递到 data.js 中
+      addUser({username, tel, password})
     }
   }
 };
